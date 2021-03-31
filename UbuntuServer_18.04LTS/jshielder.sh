@@ -273,23 +273,6 @@ secure_tmp(){
   fi
 }
 
-##############################################################################################################
-
-# Secure SSH
-secure_ssh(){
-    clear
-    f_banner
-    echo -e "\e[34m---------------------------------------------------------------------------------------------------------\e[00m"
-    echo -e "\e[93m[+]\e[00m Securing SSH"
-    echo -e "\e[34m---------------------------------------------------------------------------------------------------------\e[00m"
-    echo ""
-    echo -n " Securing SSH..."
-    spinner
-    sed s/USERNAME/$username/g templates/sshd_config > /etc/ssh/sshd_config; echo "OK"
-    chattr -i /home/$username/.ssh/authorized_keys
-    service ssh restart
-    say_done
-}
 
 ##############################################################################################################
 
@@ -1086,42 +1069,6 @@ install_arpwatch(){
   fi
 }
 
-##############################################################################################################
-
-set_grubpassword(){
-  clear
-  f_banner
-  echo -e "\e[34m---------------------------------------------------------------------------------------------------------\e[00m"
-  echo -e "\e[93m[+]\e[00m GRUB Bootloader Password"
-  echo -e "\e[34m---------------------------------------------------------------------------------------------------------\e[00m"
-  echo ""
-  echo "It is recommended to set a password on GRUB bootloader to prevent altering boot configuration (e.g. boot in single user mode without password)"
-  echo ""
-  echo -n " Do you want to set a GRUB Bootloader Password? (y/n): " ; read grub_answer
-  if [ "$grub_answer" == "y" ]; then
-    grub-mkpasswd-pbkdf2 | tee grubpassword.tmp
-    grubpassword=$(cat grubpassword.tmp | sed -e '1,2d' | cut -d ' ' -f7)
-    echo " set superusers="root" " >> /etc/grub.d/40_custom
-    echo " password_pbkdf2 root $grubpassword " >> /etc/grub.d/40_custom
-    rm grubpassword.tmp
-    update-grub
-    echo "On every boot enter root user and the password you just set"
-    echo "OK"
-    say_done
-  else
-    echo "OK"
-    say_done
-  fi
-
-echo -e ""
-echo -e "Securing Boot Settings"
-spinner
-sleep 2
-chown root:root /boot/grub/grub.cfg
-chmod og-rwx /boot/grub/grub.cfg
-say_done
-
-}    
 
 ##############################################################################################################
 
